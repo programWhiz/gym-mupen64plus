@@ -74,10 +74,14 @@ class Mupen64PlusEnv(gym.Env):
         if self.frame_skip < 1:
             self.frame_skip = 1
         self.controller_server, self.controller_server_thread = self._start_controller_server()
+
+        save_state = self._get_save_state()
+
         self.xvfb_process, self.emulator_process = \
             self._start_emulator(rom_name=self.config['ROM_NAME'],
                                  gfx_plugin=self.config['GFX_PLUGIN'],
-                                 input_driver_path=self.config['INPUT_DRIVER_PATH'])
+                                 input_driver_path=self.config['INPUT_DRIVER_PATH'],
+                                 save_state=save_state)
         with self.controller_server.frame_skip_disabled():
             self._navigate_menu()
 
@@ -101,6 +105,13 @@ class Mupen64PlusEnv(gym.Env):
                                                   [  0,  1], # D-Pad Up Button
                                                   [  0,  1], # Start Button
                                                  ])
+
+    def _get_save_state(self):
+        save_state = self.config.get('SAVE_STATE')
+        return os.path.join(self._saves_dir(), save_state)
+
+    def _saves_dir(self):
+        return os.path.join(os.path.dirname(inspect.stack()[0][1]), '../saves')
 
     def _base_load_config(self):
         self.config = yaml.safe_load(open(os.path.join(os.path.dirname(inspect.stack()[0][1]), "config.yml")))
@@ -229,7 +240,8 @@ class Mupen64PlusEnv(gym.Env):
                         input_driver_path,
                         res_w=SCR_W,
                         res_h=SCR_H,
-                        res_d=SCR_D):
+                        res_d=SCR_D,
+                        save_state=None):
 
         rom_path = os.path.abspath(
             os.path.join(os.path.dirname(inspect.stack()[0][1]),
@@ -256,6 +268,10 @@ class Mupen64PlusEnv(gym.Env):
                "--audio", "dummy",
                "--input", input_driver_path,
                rom_path]
+
+        if save_state:
+            cmd.insert(-1, '--savestate')
+            cmd.insert(-1, save_state)
 
         initial_disp = os.environ["DISPLAY"]
         cprint('Initially on DISPLAY %s' % initial_disp, 'red')

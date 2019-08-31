@@ -15,7 +15,7 @@ OFFSET_X: 400
 OFFSET_Y: 240
 
 # XVFB config:
-USE_XVFB: true
+USE_XVFB: false
 XVFB_CMD: Xvfb
 TMP_DIR: /dev/shm
 VGLRUN_CMD: vglrun
@@ -24,7 +24,10 @@ VGLRUN_CMD: vglrun
 MUPEN_CMD: mupen64plus
 
 # The name/path of the video/graphics driver/plugin:
-GFX_PLUGIN: mupen64plus-video-rice.so
+GFX_PLUGIN: /usr/local/Cellar/mupen64plus/2.5/lib/mupen64plus/mupen64plus-video-glide64mk2.dylib
 
 # The path to the mupen64plus input driver:
-INPUT_DRIVER_PATH: /usr/local/lib/mupen64plus/mupen64plus-input-bot.so
+INPUT_DRIVER_PATH: /usr/local/lib/mupen64plus/mupen64plus-input-bot.dylib
+
+# Configure this to load a ROM state (e.g. .st3) on startup
+SAVE_STATE: null
